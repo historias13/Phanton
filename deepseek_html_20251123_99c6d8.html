@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carteira Digital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Efeito de Fundo Verde Fluido */
+        .green-gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                135deg,
+                rgba(52, 199, 89, 0.08) 0%,
+                rgba(52, 199, 89, 0.03) 25%,
+                rgba(52, 199, 89, 0.01) 50%,
+                transparent 100%
+            );
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle,
+                rgba(52, 199, 89, 0.12) 0%,
+                rgba(52, 199, 89, 0.04) 40%,
+                transparent 70%
+            );
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        .shape-1 {
+            width: 250px;
+            height: 250px;
+            top: -100px;
+            right: -80px;
+            animation-delay: 0s;
+        }
+        
+        .shape-2 {
+            width: 180px;
+            height: 180px;
+            bottom: 80px;
+            left: -40px;
+            animation-delay: -3s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) scale(1);
+                opacity: 0.2;
+            }
+            50% {
+                transform: translateY(-15px) scale(1.03);
+                opacity: 0.4;
+            }
+        }
+        
+        /* Barra de Status (Superior) */
+        .status-bar {
+            background: #000000;
+            padding: 12px 16px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 15px;
+            font-weight: 600;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .time {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        /* Cabeçalho da Conta */
+        .account-header {
+            padding: 18px 16px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 390px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .account-badge {
+            background: linear-gradient(135deg, #34c759, #30b456);
+            color: #000000;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 14px;
+            min-width: 34px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(52, 199, 89, 0.3);
+        }
+        
+        .account-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            flex: 1;
+        }
+        
+        .verified-badge {
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, #34c759, #30b456);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #000000;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(52, 199, 89, 0.3);
+        }
+        
+        /* Conteúdo Principal */
+        .container {
+            max-width: 390px;
+            margin: 0 auto;
+            padding: 0px 16px 100px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .total-balance {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-top: 0px;
+        }
+        
+        .total-amount {
+            font-size: 34px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            cursor: pointer;
+            letter-spacing: -0.8px;
+        }
+        
+        .change {
+            font-size: 15px;
+            color: #34c759;
+            font-weight: 500;
+        }
+        
+        /* Botões de Ação - AJUSTADOS */
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin: 25px 0;
+            padding: 0 15px;
+            gap: 6px;
+        }
+        
+        .action-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 10px 3px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .action-button:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+        
+        .action-icon {
+            width: 42px;
+            height: 42px;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 400;
+            transition: all 0.2s ease;
+        }
+        
+        .action-label {
+            font-weight: 500;
+            font-size: 12px;
+            color: #ffffff;
+            white-space: nowrap;
+        }
+        
+        .divider {
+            height: 1px;
+            background: #333333;
+            margin: 25px 0;
+        }
+        
+        .section-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin: 25px 0 18px;
+            color: #ffffff;
+            text-align: center;
+            line-height: 1.3;
+        }
+        
+        /* Assets Container - AJUSTADO PARA TABELA */
+        .assets-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0px;
+            background: #1c1c1e;
+            border-radius: 0px;
+            overflow: hidden;
+        }
+        
+        .asset-row {
+            background: #1c1c1e;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            border-bottom: 0.5px solid #2c2c2e;
+        }
+        
+        .asset-row:last-child {
+            border-bottom: none;
+        }
+        
+        .asset-main-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        
+        .asset-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #ffffff;
+        }
+        
+        .asset-value {
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            color: #ffffff;
+            text-align: right;
+        }
+        
+        .asset-details-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #8e8e93;
+        }
+        
+        .asset-amount {
+            cursor: pointer;
+            color: #8e8e93;
+            font-size: 14px;
+        }
+        
+        .asset-change {
+            color: #34c759;
+            font-weight: 500;
+            text-align: right;
+            font-size: 14px;
+        }
+        
+        /* Barra de Navegação Inferior */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #000000;
+            padding: 10px 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #333333;
+            max-width: 390px;
+            margin: 0 auto;
+            z-index: 10;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: #8e8e93;
+            font-size: 9px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+        
+        .nav-item.active {
+            color: #ffffff;
+        }
+        
+        .nav-icon {
+            font-size: 22px;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 7px;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-item.active .nav-icon {
+            background: linear-gradient(135deg, #007aff, #5856d6);
+        }
+        
+        .nav-label {
+            font-weight: 500;
+            letter-spacing: -0.1px;
+        }
+        
+        /* Campo de Edição */
+        .edit-input {
+            width: 100%;
+            border: 1.5px solid #007aff;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: inherit;
+            font-weight: inherit;
+            background-color: #1c1c1e;
+            color: #ffffff;
+        }
+        
+        .edit-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+        }
+
+        /* Indicadores da Barra de Status */
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .cellular-icon {
+            width: 17px;
+            height: 11px;
+            position: relative;
+        }
+
+        .cellular-bars {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            align-items: flex-end;
+            gap: 1px;
+        }
+
+        .cellular-bar {
+            width: 2.5px;
+            background: #ffffff;
+            border-radius: 1px;
+        }
+
+        .cellular-bar:nth-child(1) { height: 4px; }
+        .cellular-bar:nth-child(2) { height: 6px; }
+        .cellular-bar:nth-child(3) { height: 8px; }
+        .cellular-bar:nth-child(4) { height: 10px; }
+
+        .wifi-icon {
+            width: 15px;
+            height: 11px;
+            position: relative;
+        }
+
+        .wifi-symbol {
+            width: 11px;
+            height: 11px;
+            border: 1px solid #ffffff;
+            border-top: none;
+            border-right: none;
+            border-radius: 0 0 0 7px;
+            transform: rotate(-45deg);
+            position: absolute;
+            bottom: 1px;
+            left: 2px;
+        }
+
+        .battery-icon {
+            width: 24px;
+            height: 11px;
+            position: relative;
+        }
+
+        .battery-body {
+            width: 20px;
+            height: 11px;
+            border: 1px solid #ffffff;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .battery-capacity {
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            bottom: 1px;
+            width: 14px;
+            background: #ffffff;
+            border-radius: 1px;
+        }
+
+        .battery-tip {
+            width: 1px;
+            height: 3px;
+            background: #ffffff;
+            border-radius: 0 1px 1px 0;
+            position: absolute;
+            right: -1px;
+            top: 4px;
+        }
+
+        /* Ajustes específicos para fidelidade */
+        .asset-amount, .asset-change {
+            font-size: 13px !important;
+        }
+
+        .asset-value, .asset-name {
+            font-size: 15px !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Efeitos de Fundo Verde Fluido -->
+    <div class="green-gradient-bg"></div>
+    <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+    </div>
+
+    <!-- Barra de Status Superior -->
+    <div class="status-bar">
+        <div class="time" id="currentTime">9:41</div>
+        <div class="status-right">
+            <div class="cellular-icon">
+                <div class="cellular-bars">
+                    <div class="cellular-bar"></div>
+                    <div class="cellular-bar"></div>
+                    <div class="cellular-bar"></div>
+                    <div class="cellular-bar"></div>
+                </div>
+            </div>
+            <div class="wifi-icon">
+                <div class="wifi-symbol"></div>
+            </div>
+            <div class="battery-icon">
+                <div class="battery-body">
+                    <div class="battery-capacity"></div>
+                </div>
+                <div class="battery-tip"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cabeçalho da Conta -->
+    <div class="account-header">
+        <div class="account-badge">A1</div>
+        <div class="account-name">Account 1</div>
+        <div class="verified-badge">✓</div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="container">
+        <div class="total-balance">
+            <div class="total-amount" id="totalAmount">$503,372.32</div>
+            <div class="change">+$495,119.02 +5999.05%</div>
+        </div>
+        
+        <!-- Botões de Ação -->
+        <div class="action-buttons">
+            <button class="action-button">
+                <div class="action-icon">↓</div>
+                <div class="action-label">Receive</div>
+            </button>
+            <button class="action-button">
+                <div class="action-icon">↑</div>
+                <div class="action-label">Send</div>
+            </button>
+            <button class="action-button">
+                <div class="action-icon">⇄</div>
+                <div class="action-label">Swap</div>
+            </button>
+            <button class="action-button">
+                <div class="action-icon">+</div>
+                <div class="action-label">Buy</div>
+            </button>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="section-title">Create your @username: A unique identity for your wallet</div>
+        
+        <div class="assets-container">
+            <div class="asset-row">
+                <div class="asset-main-row">
+                    <div class="asset-name">Maya</div>
+                    <div class="asset-value" id="mayaValue">$503,310.14</div>
+                </div>
+                <div class="asset-details-row">
+                    <div class="asset-amount" id="mayaAmount">548,242.90262 MAYA</div>
+                    <div class="asset-change">+$495,066.85</div>
+                </div>
+            </div>
+            
+            <div class="asset-row">
+                <div class="asset-main-row">
+                    <div class="asset-name">ferg</div>
+                    <div class="asset-value" id="fergValue">$58.91</div>
+                </div>
+                <div class="asset-details-row">
+                    <div class="asset-amount" id="fergAmount">19,527.15082 FERG</div>
+                    <div class="asset-change">+$51.92</div>
+                </div>
+            </div>
+            
+            <div class="asset-row">
+                <div class="asset-main-row">
+                    <div class="asset-name">Solana</div>
+                    <div class="asset-value" id="solanaValue">$3.26</div>
+                </div>
+                <div class="asset-details-row">
+                    <div class="asset-amount" id="solanaAmount">0.01394 SOL</div>
+                    <div class="asset-change">+$0.25</div>
+                </div>
+            </div>
+            
+            <div class="asset-row">
+                <div class="asset-main-row">
+                    <div class="asset-name">Ethereum</div>
+                    <div class="asset-value" id="ethereumValue">$0.00</div>
+                </div>
+                <div class="asset-details-row">
+                    <div class="asset-amount" id="ethereumAmount">0 ETH</div>
+                    <div class="asset-change">$0.00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra de Navegação Inferior -->
+    <div class="nav-bar">
+        <div class="nav-item active">
+            <div class="nav-icon">􀎞</div>
+            <div class="nav-label">Wallet</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">􀥋</div>
+            <div class="nav-label">Browser</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">􀣽</div>
+            <div class="nav-label">Swap</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">􀉉</div>
+            <div class="nav-label">History</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">􀣌</div>
+            <div class="nav-label">Settings</div>
+        </div>
+    </div>
+
+    <script>
+        // Atualizar hora atual
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+        }
+        
+        // Atualizar a hora a cada minuto
+        updateTime();
+        setInterval(updateTime, 60000);
+        
+        // Função para tornar um elemento editável
+        function makeEditable(elementId) {
+            const element = document.getElementById(elementId);
+            
+            element.addEventListener('click', function() {
+                const currentValue = this.textContent;
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = currentValue;
+                input.className = 'edit-input';
+                
+                // Substituir o elemento pelo input
+                this.parentNode.replaceChild(input, this);
+                input.focus();
+                
+                // Selecionar todo o texto no input
+                input.select();
+                
+                // Quando o input perder foco, voltar ao texto normal
+                input.addEventListener('blur', function() {
+                    const newValue = this.value || currentValue;
+                    const newElement = document.createElement('div');
+                    newElement.id = elementId;
+                    newElement.className = element.className;
+                    newElement.textContent = newValue;
+                    
+                    // Substituir o input pelo novo elemento
+                    this.parentNode.replaceChild(newElement, this);
+                    
+                    // Adicionar novamente o evento de clique
+                    makeEditable(elementId);
+                });
+                
+                // Permitir salvar com Enter
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        this.blur();
+                    }
+                });
+            });
+        }
+        
+        // Tornar todos os valores editáveis
+        makeEditable('totalAmount');
+        makeEditable('mayaValue');
+        makeEditable('mayaAmount');
+        makeEditable('fergValue');
+        makeEditable('fergAmount');
+        makeEditable('solanaValue');
+        makeEditable('solanaAmount');
+        makeEditable('ethereumValue');
+        makeEditable('ethereumAmount');
+        
+        // Adicionar interação aos itens da navegação
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+
+        // Adicionar funcionalidade aos botões de ação
+        document.querySelectorAll('.action-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const action = this.querySelector('.action-label').textContent;
+                alert(`Ação "${action}" selecionada!`);
+            });
+        });
+    </script>
+</body>
+</html>
